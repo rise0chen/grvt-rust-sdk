@@ -139,5 +139,5 @@ cargo test
 
 ## Compatibility Notes
 
-- **grvt-pysdk**: Signature payload omits `chain_id` (included in EIP-712 domain only). TIF codes: `GOOD_TILL_TIME=1`, `IMMEDIATE_OR_CANCEL=2`, `FILL_OR_KILL=3`.
+- **grvt-pysdk**: Signature payload omits `chain_id` (included in EIP-712 domain only). TIF codes for EIP-712 match `SignTimeInForce`: `GOOD_TILL_TIME=1`, `ALL_OR_NONE=2`, `IMMEDIATE_OR_CANCEL=3`, `FILL_OR_KILL=4`.
 - **Environments**: Prod, Testnet, Staging, Dev with distinct endpoints for trades, market-data, and auth.

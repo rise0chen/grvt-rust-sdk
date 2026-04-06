@@ -254,19 +254,22 @@ pub struct PriceLevel {
 }
 
 /// Time-in-force constants (numeric codes used for EIP-712 signing).
-/// Compatible with grvt-pysdk TIF mapping.
+/// Matches grvt-pysdk [`SignTimeInForce`](https://github.com/gravity-technologies/grvt-pysdk/blob/main/src/pysdk/grvt_raw_signing.py).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum TimeInForce {
     GoodTillTime = 1,
-    ImmediateOrCancel = 2,
-    FillOrKill = 3,
+    /// Block trades only (Python: `ALL_OR_NONE`).
+    AllOrNone = 2,
+    ImmediateOrCancel = 3,
+    FillOrKill = 4,
 }
 
 impl TimeInForce {
     pub fn as_api_str(&self) -> &'static str {
         match self {
             Self::GoodTillTime => "GOOD_TILL_TIME",
+            Self::AllOrNone => "ALL_OR_NONE",
             Self::ImmediateOrCancel => "IMMEDIATE_OR_CANCEL",
             Self::FillOrKill => "FILL_OR_KILL",
         }

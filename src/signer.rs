@@ -266,8 +266,9 @@ mod tests {
     #[test]
     fn test_tif_codes() {
         assert_eq!(TimeInForce::GoodTillTime.as_u8(), 1);
-        assert_eq!(TimeInForce::ImmediateOrCancel.as_u8(), 2);
-        assert_eq!(TimeInForce::FillOrKill.as_u8(), 3);
+        assert_eq!(TimeInForce::AllOrNone.as_u8(), 2);
+        assert_eq!(TimeInForce::ImmediateOrCancel.as_u8(), 3);
+        assert_eq!(TimeInForce::FillOrKill.as_u8(), 4);
         assert_eq!(
             TimeInForce::GoodTillTime.as_api_str(),
             "GOOD_TILL_TIME"
