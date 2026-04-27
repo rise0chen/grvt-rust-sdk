@@ -42,12 +42,7 @@ pub async fn login(client: &Client, env: &Environment, api_key: &str) -> Result<
         .get_all("set-cookie")
         .iter()
         .filter_map(|v| v.to_str().ok())
-        .find_map(|v| {
-            v.split(';')
-                .next()
-                .filter(|c| c.starts_with("gravity="))
-                .map(|c| c.to_string())
-        })
+        .find_map(|v| v.split(';').next().filter(|c| c.starts_with("gravity=")).map(|c| c.to_string()))
         .ok_or(GrvtError::MissingSessionCookie)?;
 
     let account_id = resp
@@ -58,10 +53,7 @@ pub async fn login(client: &Client, env: &Environment, api_key: &str) -> Result<
         .map_err(|_| GrvtError::MissingAccountId)?
         .to_string();
 
-    Ok(AuthSession {
-        account_id,
-        session_cookie,
-    })
+    Ok(AuthSession { account_id, session_cookie })
 }
 
 /// Convenience: log in using the provided [`GrvtConfig`] and return an [`AuthSession`].

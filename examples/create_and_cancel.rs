@@ -19,15 +19,8 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
             instrument: instrument.clone(),
         })
         .await?;
-    let info = inst_resp
-        .result
-        .ok_or(grvt_rust_sdk::GrvtError::Config(
-            "instrument not found".into(),
-        ))?;
-    let instrument_hash = info
-        .instrument_hash
-        .as_deref()
-        .unwrap_or("0x030501");
+    let info = inst_resp.result.ok_or(grvt_rust_sdk::GrvtError::Config("instrument not found".into()))?;
+    let instrument_hash = info.instrument_hash.as_deref().unwrap_or("0x030501");
     let _base_decimals = info.base_decimals.unwrap_or(9);
 
     // 2. Sign the order
@@ -52,19 +45,14 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
         chain_id: config.effective_chain_id(),
     };
     let priv_key = decode_private_key(
-        &config
+        config
             .private_key_hex
             .as_ref()
-            .ok_or(grvt_rust_sdk::GrvtError::Config(
-                "GRVT_PRIVATE_KEY required for signing".into(),
-            ))?,
+            .ok_or(grvt_rust_sdk::GrvtError::Config("GRVT_PRIVATE_KEY required for signing".into()))?,
     )?;
     let signed = sign_order(&params, &priv_key)?;
 
-    let client_order_id = chrono::Utc::now()
-        .timestamp_nanos_opt()
-        .unwrap_or(0)
-        .to_string();
+    let client_order_id = chrono::Utc::now().timestamp_nanos_opt().unwrap_or(0).to_string();
 
     // 3. Build and send create request
     let req = CreateOrderRequest {

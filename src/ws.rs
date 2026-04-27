@@ -3,7 +3,6 @@ use serde_json::json;
 use tokio::sync::mpsc;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tokio_tungstenite::{connect_async, tungstenite::Message as WsMessage};
-use url::Url;
 
 use crate::config::Environment;
 use crate::error::{GrvtError, Result};
@@ -22,16 +21,9 @@ fn ws_err(e: impl std::fmt::Debug) -> GrvtError {
 /// Returns a channel receiver that yields [`MarketDataEvent`] values.
 /// The WebSocket read loop runs in a spawned task; dropping the receiver
 /// will cause the task to terminate on the next send attempt.
-pub async fn subscribe_market_data(
-    env: &Environment,
-    instrument: &str,
-    buffer: usize,
-) -> Result<mpsc::Receiver<MarketDataEvent>> {
+pub async fn subscribe_market_data(env: &Environment, instrument: &str, buffer: usize) -> Result<mpsc::Receiver<MarketDataEvent>> {
     let ws_url = env.market_data_ws();
-    let request = Url::parse(ws_url)
-        .map_err(ws_err)?
-        .into_client_request()
-        .map_err(ws_err)?;
+    let request = ws_url.into_client_request().map_err(ws_err)?;
 
     let (ws_stream, _resp) = connect_async(request).await.map_err(ws_err)?;
     let (mut write, mut read) = ws_stream.split();
@@ -54,8 +46,8 @@ pub async fn subscribe_market_data(
     })
     .to_string();
 
-    write.send(WsMessage::Text(sub_book)).await.map_err(ws_err)?;
-    write.send(WsMessage::Text(sub_trade)).await.map_err(ws_err)?;
+    write.send(WsMessage::Text(sub_book.into())).await.map_err(ws_err)?;
+    write.send(WsMessage::Text(sub_trade.into())).await.map_err(ws_err)?;
 
     let (tx, rx) = mpsc::channel(buffer);
 
@@ -89,11 +81,7 @@ fn parse_market_data_message(text: &str) -> Option<MarketDataEvent> {
     let stream = v
         .get("stream")
         .and_then(|s| s.as_str())
-        .or_else(|| {
-            v.get("params")
-                .and_then(|p| p.get("stream"))
-                .and_then(|s| s.as_str())
-        })
+        .or_else(|| v.get("params").and_then(|p| p.get("stream")).and_then(|s| s.as_str()))
         .unwrap_or("");
 
     match stream {
@@ -105,21 +93,10 @@ fn parse_market_data_message(text: &str) -> Option<MarketDataEvent> {
         }
         "v1.trade" => {
             let feed = v.get("feed")?;
-            let price = feed
-                .get("price")
-                .and_then(|x| x.as_str())
-                .and_then(|p| p.parse::<f64>().ok())?;
-            let size = feed
-                .get("size")
-                .and_then(|x| x.as_str())
-                .and_then(|s| s.parse::<f64>().ok())?;
-            let event_time = feed
-                .get("event_time")
-                .and_then(|x| x.as_str())
-                .and_then(|t| t.parse::<i64>().ok())?;
-            let is_taker_buyer = feed
-                .get("is_taker_buyer")
-                .and_then(|x| x.as_bool());
+            let price = feed.get("price").and_then(|x| x.as_str()).and_then(|p| p.parse::<f64>().ok())?;
+            let size = feed.get("size").and_then(|x| x.as_str()).and_then(|s| s.parse::<f64>().ok())?;
+            let event_time = feed.get("event_time").and_then(|x| x.as_str()).and_then(|t| t.parse::<i64>().ok())?;
+            let is_taker_buyer = feed.get("is_taker_buyer").and_then(|x| x.as_bool());
 
             Some(MarketDataEvent::Trade {
                 price,
@@ -138,14 +115,8 @@ fn parse_price_levels(arr: Option<&serde_json::Value>) -> Vec<PriceLevel> {
     };
     arr.iter()
         .filter_map(|entry| {
-            let price = entry
-                .get("price")
-                .and_then(|x| x.as_str())
-                .and_then(|p| p.parse::<f64>().ok())?;
-            let size = entry
-                .get("size")
-                .and_then(|x| x.as_str())
-                .and_then(|s| s.parse::<f64>().ok())?;
+            let price = entry.get("price").and_then(|x| x.as_str()).and_then(|p| p.parse::<f64>().ok())?;
+            let size = entry.get("size").and_then(|x| x.as_str()).and_then(|s| s.parse::<f64>().ok())?;
             Some(PriceLevel { price, size })
         })
         .collect()
@@ -166,21 +137,12 @@ pub async fn subscribe_state(
     selectors: Vec<String>,
     buffer: usize,
 ) -> Result<mpsc::Receiver<StateEvent>> {
-    let mut request = Url::parse(env.full_ws())
-        .map_err(ws_err)?
-        .into_client_request()
-        .map_err(ws_err)?;
+    let mut request = env.full_ws().into_client_request().map_err(ws_err)?;
 
     {
         let headers = request.headers_mut();
-        headers.insert(
-            "Cookie",
-            session_cookie.parse().map_err(ws_err)?,
-        );
-        headers.insert(
-            "X-Grvt-Account-Id",
-            account_id.parse().map_err(ws_err)?,
-        );
+        headers.insert("Cookie", session_cookie.parse().map_err(ws_err)?);
+        headers.insert("X-Grvt-Account-Id", account_id.parse().map_err(ws_err)?);
     }
 
     let (ws_stream, _resp) = connect_async(request).await.map_err(ws_err)?;
@@ -197,10 +159,7 @@ pub async fn subscribe_state(
     })
     .to_string();
 
-    write
-        .send(WsMessage::Text(subscribe_msg))
-        .await
-        .map_err(ws_err)?;
+    write.send(WsMessage::Text(subscribe_msg.into())).await.map_err(ws_err)?;
 
     let (tx, rx) = mpsc::channel(buffer);
 

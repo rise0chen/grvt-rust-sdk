@@ -65,8 +65,7 @@ pub struct SignedOrder {
 /// Derive the Ethereum address from a secp256k1 secret key.
 pub fn address_from_private_key(private_key_bytes: &[u8]) -> Result<String> {
     let secp = Secp256k1::new();
-    let sk = SecretKey::from_slice(private_key_bytes)
-        .map_err(|e| GrvtError::Signing(format!("invalid private key: {e}")))?;
+    let sk = SecretKey::from_slice(private_key_bytes).map_err(|e| GrvtError::Signing(format!("invalid private key: {e}")))?;
     let pk = secp256k1::PublicKey::from_secret_key(&secp, &sk);
     let uncompressed = pk.serialize_uncompressed();
     let hash = keccak256(&uncompressed[1..]);
@@ -82,11 +81,7 @@ pub fn decode_private_key(hex_str: &str) -> Result<Vec<u8>> {
 /// Parse an instrument_hash hex string into a [`U256`].
 pub fn parse_instrument_hash(hash_hex: &str) -> Result<U256> {
     let raw = hash_hex.trim_start_matches("0x");
-    let padded = if raw.len() % 2 == 1 {
-        format!("0{raw}")
-    } else {
-        raw.to_string()
-    };
+    let padded = if raw.len() % 2 == 1 { format!("0{raw}") } else { raw.to_string() };
     let bytes = hex::decode(&padded)?;
     if bytes.is_empty() {
         Ok(U256::ZERO)
@@ -118,8 +113,7 @@ pub fn scale_price(price: f64) -> u64 {
 /// * `private_key_bytes` - Raw 32-byte secp256k1 private key.
 pub fn sign_order(params: &SignOrderParams, private_key_bytes: &[u8]) -> Result<SignedOrder> {
     let secp = Secp256k1::new();
-    let secret_key = SecretKey::from_slice(private_key_bytes)
-        .map_err(|e| GrvtError::Signing(format!("invalid private key: {e}")))?;
+    let secret_key = SecretKey::from_slice(private_key_bytes).map_err(|e| GrvtError::Signing(format!("invalid private key: {e}")))?;
 
     let signer_address = address_from_private_key(private_key_bytes)?;
 
@@ -155,13 +149,12 @@ pub fn sign_order(params: &SignOrderParams, private_key_bytes: &[u8]) -> Result<
 
     let digest: B256 = order.eip712_signing_hash(&domain);
 
-    let msg = Message::from_slice(digest.as_ref())
-        .map_err(|e| GrvtError::Signing(format!("message creation failed: {e}")))?;
+    let msg = Message::from_digest(*digest);
     let recoverable: RecoverableSignature = secp.sign_ecdsa_recoverable(&msg, &secret_key);
     let (recid, compact) = recoverable.serialize_compact();
     let r = format!("0x{}", hex::encode(&compact[..32]));
     let s = format!("0x{}", hex::encode(&compact[32..]));
-    let v: u8 = recid.to_i32() as u8 + 27;
+    let v: u8 = i32::from(recid) as u8 + 27;
 
     Ok(SignedOrder {
         signature: OrderSignature {
@@ -181,14 +174,12 @@ pub fn sign_order(params: &SignOrderParams, private_key_bytes: &[u8]) -> Result<
 /// Generate a random nonce suitable for order signing.
 pub fn random_nonce() -> u32 {
     use rand::RngCore;
-    rand::thread_rng().next_u32()
+    rand::rng().next_u32()
 }
 
 /// Compute a default expiration (now + 1 hour) in nanoseconds.
 pub fn default_expiration_ns() -> i64 {
-    let now_ns = chrono::Utc::now()
-        .timestamp_nanos_opt()
-        .unwrap_or(0);
+    let now_ns = chrono::Utc::now().timestamp_nanos_opt().unwrap_or(0);
     let exp = (now_ns as i128) + 60 * 60 * 1_000_000_000;
     exp.clamp(i64::MIN as i128, i64::MAX as i128) as i64
 }
@@ -197,8 +188,7 @@ pub fn default_expiration_ns() -> i64 {
 mod tests {
     use super::*;
 
-    const TEST_PRIVATE_KEY: &str =
-        "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+    const TEST_PRIVATE_KEY: &str = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 
     #[test]
     fn test_address_derivation() {
@@ -207,10 +197,7 @@ mod tests {
         assert!(addr.starts_with("0x"));
         assert_eq!(addr.len(), 42);
         // Hardhat account #0
-        assert_eq!(
-            addr.to_lowercase(),
-            "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
-        );
+        assert_eq!(addr.to_lowercase(), "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266");
     }
 
     #[test]
@@ -269,9 +256,6 @@ mod tests {
         assert_eq!(TimeInForce::AllOrNone.as_u8(), 2);
         assert_eq!(TimeInForce::ImmediateOrCancel.as_u8(), 3);
         assert_eq!(TimeInForce::FillOrKill.as_u8(), 4);
-        assert_eq!(
-            TimeInForce::GoodTillTime.as_api_str(),
-            "GOOD_TILL_TIME"
-        );
+        assert_eq!(TimeInForce::GoodTillTime.as_api_str(), "GOOD_TILL_TIME");
     }
 }

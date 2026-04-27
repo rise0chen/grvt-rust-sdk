@@ -113,12 +113,7 @@ impl GrvtClient {
 
     // --- internal helpers ---
 
-    async fn post<T: Serialize, U: DeserializeOwned>(
-        &self,
-        base: &str,
-        path: &str,
-        body: &T,
-    ) -> Result<U> {
+    async fn post<T: Serialize, U: DeserializeOwned>(&self, base: &str, path: &str, body: &T) -> Result<U> {
         let url = format!("{base}{path}");
 
         if tracing::enabled!(tracing::Level::TRACE) {
@@ -152,10 +147,7 @@ async fn handle_response<T: DeserializeOwned>(path: &str, resp: reqwest::Respons
         Ok(parsed)
     } else {
         tracing::warn!(status = %status, path, body = %truncate(&text, 4096), "GRVT error response");
-        Err(GrvtError::ApiStatus {
-            status,
-            body: text,
-        })
+        Err(GrvtError::ApiStatus { status, body: text })
     }
 }
 

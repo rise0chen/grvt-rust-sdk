@@ -124,12 +124,8 @@ impl GrvtConfig {
         let environment = resolve_environment();
         let api_key = resolve_api_key(&environment)?;
         let sub_account_id = resolve_sub_account_id()?;
-        let private_key_hex = env::var("GRVT_PRIVATE_KEY")
-            .or_else(|_| env::var("GRVT_API_SECRET_TESTNET"))
-            .ok();
-        let chain_id = env::var("GRVT_CHAIN_ID")
-            .ok()
-            .and_then(|v| v.parse().ok());
+        let private_key_hex = env::var("GRVT_PRIVATE_KEY").or_else(|_| env::var("GRVT_API_SECRET_TESTNET")).ok();
+        let chain_id = env::var("GRVT_CHAIN_ID").ok().and_then(|v| v.parse().ok());
 
         Ok(Self {
             environment,
@@ -181,15 +177,11 @@ impl GrvtConfigBuilder {
     }
 
     pub fn build(self) -> crate::error::Result<GrvtConfig> {
-        let environment = self.environment.ok_or_else(|| {
-            GrvtError::Config("environment is required".into())
-        })?;
-        let api_key = self.api_key.ok_or_else(|| {
-            GrvtError::Config("api_key is required".into())
-        })?;
-        let sub_account_id = self.sub_account_id.ok_or_else(|| {
-            GrvtError::Config("sub_account_id is required".into())
-        })?;
+        let environment = self.environment.ok_or_else(|| GrvtError::Config("environment is required".into()))?;
+        let api_key = self.api_key.ok_or_else(|| GrvtError::Config("api_key is required".into()))?;
+        let sub_account_id = self
+            .sub_account_id
+            .ok_or_else(|| GrvtError::Config("sub_account_id is required".into()))?;
 
         Ok(GrvtConfig {
             environment,
@@ -245,9 +237,7 @@ fn resolve_sub_account_id() -> crate::error::Result<String> {
             }
         }
     }
-    Err(GrvtError::Config(
-        "GRVT_TRADING_ACCOUNT_ID or GRVT_SUB_ACCOUNT_ID must be set".into(),
-    ))
+    Err(GrvtError::Config("GRVT_TRADING_ACCOUNT_ID or GRVT_SUB_ACCOUNT_ID must be set".into()))
 }
 
 #[cfg(test)]

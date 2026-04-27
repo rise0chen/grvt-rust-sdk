@@ -1,7 +1,7 @@
 // Quick Start 3: Order Signing (EIP-712)
 use grvt_rust_sdk::signer::{
-    decode_private_key, default_expiration_ns, parse_instrument_hash, random_nonce,
-    scale_price, scale_size, sign_order, SignOrderLeg, SignOrderParams,
+    decode_private_key, default_expiration_ns, parse_instrument_hash, random_nonce, scale_price, scale_size, sign_order, SignOrderLeg,
+    SignOrderParams,
 };
 use grvt_rust_sdk::types::TimeInForce;
 
@@ -32,8 +32,7 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
         chain_id: 326,
     };
 
-    let private_key_hex = std::env::var("GRVT_PRIVATE_KEY")
-        .map_err(|e| grvt_rust_sdk::GrvtError::Config(e.to_string()))?;
+    let private_key_hex = std::env::var("GRVT_PRIVATE_KEY").map_err(|e| grvt_rust_sdk::GrvtError::Config(e.to_string()))?;
     let private_key_bytes = decode_private_key(&private_key_hex)?;
     let signed = sign_order(&params, &private_key_bytes)?;
 
