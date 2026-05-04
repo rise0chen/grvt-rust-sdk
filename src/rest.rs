@@ -93,7 +93,7 @@ impl GrvtClient {
         self.post(self.env.full_base(), "/full/v1/positions", body).await
     }
 
-    pub async fn instrument_full(&self, body: &InstrumentRequest) -> Result<InstrumentResponse> {
+    pub async fn instrument_full(&self, body: &InstrumentRequest) -> Result<ResultItem<InstrumentInfo>> {
         self.post(self.env.market_data_base(), "/full/v1/instrument", body).await
     }
 
