@@ -19,7 +19,7 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
             instrument: instrument.clone(),
         })
         .await?;
-    let info = inst_resp.result.ok_or(grvt_rust_sdk::GrvtError::Config("instrument not found".into()))?;
+    let info = inst_resp.result;
     let instrument_hash = info.instrument_hash.as_deref().unwrap_or("0x030501");
     let _base_decimals = info.base_decimals.unwrap_or(9);
 

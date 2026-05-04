@@ -27,9 +27,26 @@ pub struct AccountSummaryRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AccountSummaryResponse {
-    pub result: AccountSummary,
+pub struct FundingAccountSummaryResponse {
+    pub result: FundingAccountSummary,
+    pub tier: Tier,
 }
+#[serde_as]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Tier {
+    pub tier: f64,
+    pub futures_taker_fee: f64,
+    pub futures_maker_fee: f64,
+    pub options_taker_fee: f64,
+    pub options_maker_fee: f64,
+}
+#[serde_as]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FundingAccountSummary {
+    #[serde_as(as = "DisplayFromStr")]
+    pub total_equity: f64,
+}
+
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AccountSummary {
@@ -156,11 +173,6 @@ pub struct SubAccountRequest {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InstrumentRequest {
     pub instrument: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct InstrumentResponse {
-    pub result: Option<InstrumentInfo>,
 }
 
 #[serde_as]

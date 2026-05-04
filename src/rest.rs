@@ -65,7 +65,11 @@ impl GrvtClient {
 
     // --- Full API ---
 
-    pub async fn account_summary_full(&self, body: &AccountSummaryRequest) -> Result<AccountSummaryResponse> {
+    pub async fn funding_account_summary_full(&self) -> Result<FundingAccountSummaryResponse> {
+        self.post(self.env.full_base(), "/full/v1/funding_account_summary", &None::<()>).await
+    }
+
+    pub async fn account_summary_full(&self, body: &AccountSummaryRequest) -> Result<ResultItem<AccountSummary>> {
         self.post(self.env.full_base(), "/full/v1/account_summary", body).await
     }
 

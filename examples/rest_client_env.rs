@@ -7,6 +7,9 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
     let config = GrvtConfig::from_env()?;
     let client = GrvtClient::from_config(&config).await?;
 
+    let account = client.funding_account_summary_full().await?;
+    println!("Account: {:?}", account);
+
     let account = client
         .account_summary_full(&grvt_rust_sdk::types::AccountSummaryRequest {
             sub_account_id: config.sub_account_id.clone(),
