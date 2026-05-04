@@ -37,6 +37,14 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
         .await?;
     println!("ticker: {:?}", ticker.result);
 
+    let book = client
+        .book_full(&grvt_rust_sdk::types::BookRequest {
+            instrument: "BTC_USDT_Perp".into(),
+            depth: 10,
+        })
+        .await?;
+    println!("book: {:?}", book.result);
+
     let funding = client
         .funding_full(&grvt_rust_sdk::types::FundingRequest {
             instrument: "BTC_USDT_Perp".into(),

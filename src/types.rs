@@ -211,6 +211,21 @@ pub struct FundingRate {
     pub funding_time: u128,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BookRequest {
+    pub instrument: String,
+    pub depth: u16,
+}
+#[serde_as]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Book {
+    pub instrument: String,
+    pub asks: Vec<PriceLevel>,
+    pub bids: Vec<PriceLevel>,
+    #[serde_as(as = "DisplayFromStr")]
+    pub event_time: u128,
+}
+
 // ---------------------------------------------------------------------------
 // Order response types
 // ---------------------------------------------------------------------------
@@ -346,9 +361,12 @@ pub enum MarketDataEvent {
     },
 }
 
-#[derive(Debug, Clone)]
+#[serde_as]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriceLevel {
+    #[serde_as(as = "DisplayFromStr")]
     pub price: f64,
+    #[serde_as(as = "DisplayFromStr")]
     pub size: f64,
 }
 

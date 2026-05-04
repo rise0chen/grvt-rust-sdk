@@ -101,6 +101,10 @@ impl GrvtClient {
         self.post(self.env.market_data_base(), "/full/v1/ticker", body).await
     }
 
+    pub async fn book_full(&self, body: &BookRequest) -> Result<ResultItem<Book>> {
+        self.post(self.env.market_data_base(), "/full/v1/book", body).await
+    }
+
     pub async fn funding_full(&self, body: &FundingRequest) -> Result<ResultList<FundingRate>> {
         self.post(self.env.market_data_base(), "/full/v1/funding", body).await
     }
