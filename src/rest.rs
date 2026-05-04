@@ -65,8 +65,16 @@ impl GrvtClient {
 
     // --- Full API ---
 
+    pub async fn account_summary_full(&self, body: &AccountSummaryRequest) -> Result<AccountSummaryResponse> {
+        self.post(self.env.full_base(), "/full/v1/account_summary", body).await
+    }
+
     pub async fn create_order_full(&self, body: &CreateOrderRequest) -> Result<CreateOrderResponse> {
         self.post(self.env.full_base(), "/full/v1/create_order", body).await
+    }
+
+    pub async fn get_order_full(&self, body: &GetOrderRequest) -> Result<CreateOrderResponse> {
+        self.post(self.env.full_base(), "/full/v1/order", body).await
     }
 
     pub async fn cancel_order_full(&self, body: &CancelOrderRequest) -> Result<ApiResult<()>> {
@@ -81,12 +89,20 @@ impl GrvtClient {
         self.post(self.env.full_base(), "/full/v1/open_orders", body).await
     }
 
-    pub async fn positions_full(&self, body: &SubAccountRequest) -> Result<ResultList<PositionItem>> {
+    pub async fn positions_full(&self, body: &PosotionsRequest) -> Result<ResultList<PositionItem>> {
         self.post(self.env.full_base(), "/full/v1/positions", body).await
     }
 
     pub async fn instrument_full(&self, body: &InstrumentRequest) -> Result<InstrumentResponse> {
         self.post(self.env.market_data_base(), "/full/v1/instrument", body).await
+    }
+
+    pub async fn ticker_full(&self, body: &InstrumentRequest) -> Result<ResultItem<TickerInfo>> {
+        self.post(self.env.market_data_base(), "/full/v1/ticker", body).await
+    }
+
+    pub async fn funding_full(&self, body: &FundingRequest) -> Result<ResultList<FundingRate>> {
+        self.post(self.env.market_data_base(), "/full/v1/funding", body).await
     }
 
     // --- Lite API ---
@@ -107,7 +123,7 @@ impl GrvtClient {
         self.post(self.env.lite_base(), "/lite/v1/open_orders", body).await
     }
 
-    pub async fn positions_lite(&self, body: &SubAccountRequest) -> Result<ResultList<PositionItem>> {
+    pub async fn positions_lite(&self, body: &PosotionsRequest) -> Result<ResultList<PositionItem>> {
         self.post(self.env.lite_base(), "/lite/v1/positions", body).await
     }
 

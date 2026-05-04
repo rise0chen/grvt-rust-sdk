@@ -7,6 +7,7 @@ use grvt_rust_sdk::types::TimeInForce;
 
 #[tokio::main]
 async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
+    dotenvy::dotenv().ok();
     // Load instrument metadata (e.g. from instrument_full API)
     let instrument_hash = "0x030501"; // from API
     let base_decimals = 9u32;

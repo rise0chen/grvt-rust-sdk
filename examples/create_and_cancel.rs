@@ -83,8 +83,17 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
         },
     };
 
-    let _create_resp = client.create_order_full(&req).await?;
+    let create_resp = client.create_order_full(&req).await?;
     println!("Created order with client_order_id: {client_order_id}");
+    println!("order: {create_resp:?}");
+
+    let get_req = GetOrderRequest {
+        sub_account_id: config.sub_account_id.clone(),
+        order_id: None,
+        client_order_id: Some(client_order_id.clone()),
+    };
+    let get_resp = client.get_order_full(&get_req).await?;
+    println!("order: {get_resp:?}");
 
     // 4. Cancel the same order by client_order_id (order_id can be unavailable)
     let cancel_req = CancelOrderRequest {
