@@ -236,26 +236,41 @@ pub struct OpenOrderItem {
     pub builder_fee: Option<String>,
 }
 
+#[serde_as]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PositionItem {
-    pub event_time: Option<String>,
-    pub sub_account_id: Option<String>,
-    pub instrument: Option<String>,
-    pub size: Option<String>,
-    pub notional: Option<String>,
-    pub entry_price: Option<String>,
-    pub exit_price: Option<String>,
-    pub mark_price: Option<String>,
-    pub unrealized_pnl: Option<String>,
-    pub realized_pnl: Option<String>,
-    pub total_pnl: Option<String>,
-    pub roi: Option<String>,
-    pub quote_index_price: Option<String>,
-    pub est_liquidation_price: Option<String>,
-    pub leverage: Option<String>,
-    pub cumulative_fee: Option<String>,
-    pub cumulative_realized_funding_payment: Option<String>,
-    pub margin_type: Option<String>,
+    pub event_time: String,
+    pub sub_account_id: String,
+    pub instrument: String,
+    #[serde_as(as = "DisplayFromStr")]
+    pub size: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub notional: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub entry_price: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub exit_price: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub mark_price: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub unrealized_pnl: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub realized_pnl: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub total_pnl: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub roi: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub quote_index_price: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub est_liquidation_price: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub leverage: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub cumulative_fee: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub cumulative_realized_funding_payment: f64,
+    pub margin_type: String,
 }
 
 #[serde_as]
