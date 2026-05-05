@@ -20,11 +20,11 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
         })
         .await?;
     let info = inst_resp.result;
-    let instrument_hash = info.instrument_hash.as_deref().unwrap_or("0x030501");
-    let _base_decimals = info.base_decimals.unwrap_or(9);
+    let instrument_hash = info.instrument_hash;
+    let _base_decimals = info.base_decimals;
 
     // 2. Sign the order
-    let asset_id = parse_instrument_hash(instrument_hash)?;
+    let asset_id = parse_instrument_hash(&instrument_hash)?;
     // GRVT signature uses 1e9 size scaling for BTC/ETH style contracts.
     let signed_contract_size = scale_size(size, 9);
     let signed_limit_price = scale_price(limit_price);
@@ -102,9 +102,6 @@ async fn main() -> Result<(), grvt_rust_sdk::GrvtError> {
         client_order_id: Some(client_order_id.clone()),
     };
     let cancel_resp = client.cancel_order_full(&cancel_req).await?;
-    println!(
-        "Cancel result: code={:?}, msg={:?}, client_order_id={client_order_id}",
-        cancel_resp.code, cancel_resp.msg
-    );
+    println!("Cancel result: {cancel_resp:?}, client_order_id={client_order_id}");
     Ok(())
 }

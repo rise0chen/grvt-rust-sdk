@@ -275,6 +275,6 @@ mod tests {
         let feed = event.feed.unwrap();
         assert_eq!(feed.order_id.as_deref(), Some("0xabc"));
         let state = feed.order_state.unwrap();
-        assert_eq!(state.status.as_deref(), Some("FILLED"));
+        assert_eq!(state.status, "FILLED");
     }
 }

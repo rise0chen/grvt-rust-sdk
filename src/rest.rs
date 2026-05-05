@@ -81,11 +81,11 @@ impl GrvtClient {
         self.post(self.env.full_base(), "/full/v1/order", body).await
     }
 
-    pub async fn cancel_order_full(&self, body: &CancelOrderRequest) -> Result<ApiResult<()>> {
+    pub async fn cancel_order_full(&self, body: &CancelOrderRequest) -> Result<ResultItem<Ack>> {
         self.post(self.env.full_base(), "/full/v1/cancel_order", body).await
     }
 
-    pub async fn cancel_all_orders_full(&self, body: &CancelAllOrdersRequest) -> Result<ApiResult<()>> {
+    pub async fn cancel_all_orders_full(&self, body: &CancelAllOrdersRequest) -> Result<ResultItem<Ack>> {
         self.post(self.env.full_base(), "/full/v1/cancel_all_orders", body).await
     }
 
@@ -119,11 +119,11 @@ impl GrvtClient {
         self.post(self.env.lite_base(), "/lite/v1/create_order", body).await
     }
 
-    pub async fn cancel_order_lite(&self, body: &CancelOrderRequest) -> Result<ApiResult<()>> {
+    pub async fn cancel_order_lite(&self, body: &CancelOrderRequest) -> Result<ResultItem<Ack>> {
         self.post(self.env.lite_base(), "/lite/v1/cancel_order", body).await
     }
 
-    pub async fn cancel_all_orders_lite(&self, body: &CancelAllOrdersRequest) -> Result<ApiResult<()>> {
+    pub async fn cancel_all_orders_lite(&self, body: &CancelAllOrdersRequest) -> Result<ResultItem<Ack>> {
         self.post(self.env.lite_base(), "/lite/v1/cancel_all_orders", body).await
     }
 

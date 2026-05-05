@@ -6,6 +6,11 @@ use serde_with::{serde_as, DisplayFromStr};
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct Ack {
+    pub ack: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ApiResult<T> {
     pub code: Option<String>,
     pub data: Option<T>,
@@ -178,16 +183,16 @@ pub struct InstrumentRequest {
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InstrumentInfo {
-    pub instrument: Option<String>,
-    pub instrument_hash: Option<String>,
-    pub base_decimals: Option<u32>,
-    pub quote_decimals: Option<u32>,
-    #[serde_as(as = "Option<DisplayFromStr>")]
-    pub tick_size: Option<f64>,
-    #[serde_as(as = "Option<DisplayFromStr>")]
-    pub min_size: Option<f64>,
-    #[serde_as(as = "Option<DisplayFromStr>")]
-    pub min_notional: Option<f64>,
+    pub instrument: String,
+    pub instrument_hash: String,
+    pub base_decimals: u32,
+    pub quote_decimals: u32,
+    #[serde_as(as = "DisplayFromStr")]
+    pub tick_size: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub min_size: f64,
+    #[serde_as(as = "DisplayFromStr")]
+    pub min_notional: f64,
 }
 
 #[serde_as]
@@ -250,17 +255,17 @@ pub struct CreateOrderResponse {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OpenOrderItem {
     pub order_id: Option<String>,
-    pub sub_account_id: Option<String>,
+    pub sub_account_id: String,
     pub is_market: Option<bool>,
-    pub time_in_force: Option<String>,
+    pub time_in_force: String,
     pub post_only: Option<bool>,
     pub reduce_only: Option<bool>,
-    pub legs: Option<Vec<OrderLegResponse>>,
-    pub signature: Option<OrderSignatureResponse>,
-    pub metadata: Option<OrderMetadata>,
+    pub legs: Vec<OrderLegResponse>,
+    pub signature: OrderSignatureResponse,
+    pub metadata: OrderMetadata,
     pub state: Option<OrderState>,
-    pub builder: Option<String>,
-    pub builder_fee: Option<String>,
+    pub builder: String,
+    pub builder_fee: String,
 }
 
 #[serde_as]
@@ -303,12 +308,12 @@ pub struct PositionItem {
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OrderLegResponse {
-    pub instrument: Option<String>,
-    #[serde_as(as = "Option<DisplayFromStr>")]
-    pub size: Option<f64>,
+    pub instrument: String,
+    #[serde_as(as = "DisplayFromStr")]
+    pub size: f64,
     #[serde_as(as = "Option<DisplayFromStr>")]
     pub limit_price: Option<f64>,
-    pub is_buying_asset: Option<bool>,
+    pub is_buying_asset: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -325,15 +330,15 @@ pub struct OrderSignatureResponse {
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OrderState {
-    pub status: Option<String>,
-    pub reject_reason: Option<String>,
-    #[serde_as(as = "Option<Vec<DisplayFromStr>>")]
-    pub book_size: Option<Vec<f64>>,
-    #[serde_as(as = "Option<Vec<DisplayFromStr>>")]
-    pub traded_size: Option<Vec<f64>>,
-    pub update_time: Option<String>,
-    #[serde_as(as = "Option<Vec<DisplayFromStr>>")]
-    pub avg_fill_price: Option<Vec<f64>>,
+    pub status: String,
+    pub reject_reason: String,
+    #[serde_as(as = "Vec<DisplayFromStr>")]
+    pub book_size: Vec<f64>,
+    #[serde_as(as = "Vec<DisplayFromStr>")]
+    pub traded_size: Vec<f64>,
+    pub update_time: String,
+    #[serde_as(as = "Vec<DisplayFromStr>")]
+    pub avg_fill_price: Vec<f64>,
 }
 
 // ---------------------------------------------------------------------------
