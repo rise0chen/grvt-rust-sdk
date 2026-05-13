@@ -1,8 +1,12 @@
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
+use std::sync::atomic::{AtomicU64, Ordering::SeqCst};
+use std::sync::Arc;
+use time::OffsetDateTime;
+use tokio::sync::RwLock;
 
-use crate::auth::{self, AuthSession};
+use crate::auth;
 use crate::config::{Environment, GrvtConfig};
 use crate::error::{GrvtError, Result};
 use crate::types::*;
@@ -15,21 +19,13 @@ use crate::types::*;
 pub struct GrvtClient {
     pub env: Environment,
     pub account_id: String,
-    pub session_cookie: String,
+    pub session_time: Arc<AtomicU64>,
+    pub session_cookie: Arc<RwLock<Arc<String>>>,
     inner: reqwest::Client,
+    api_key: String,
 }
 
 impl GrvtClient {
-    /// Create a client from explicit session credentials.
-    pub fn new(env: Environment, account_id: String, session_cookie: String) -> Self {
-        Self {
-            env,
-            account_id,
-            session_cookie,
-            inner: reqwest::Client::new(),
-        }
-    }
-
     /// Create a client by logging in with an API key.
     pub async fn from_api_key(env: Environment, api_key: &str) -> Result<Self> {
         let inner = reqwest::Client::new();
@@ -37,8 +33,10 @@ impl GrvtClient {
         Ok(Self {
             env,
             account_id: session.account_id,
-            session_cookie: session.session_cookie,
+            session_time: Arc::new(AtomicU64::new((OffsetDateTime::now_utc().unix_timestamp_nanos() / 1_000_000) as u64)),
+            session_cookie: Arc::new(RwLock::new(Arc::new(session.session_cookie))),
             inner,
+            api_key: api_key.into(),
         })
     }
 
@@ -47,17 +45,27 @@ impl GrvtClient {
         Self::from_api_key(config.environment, &config.api_key).await
     }
 
-    /// Create a client from a pre-existing [`AuthSession`].
-    pub fn from_session(env: Environment, session: AuthSession) -> Self {
-        Self::new(env, session.account_id, session.session_cookie)
+    pub async fn get_session_cookie(&self) -> Arc<String> {
+        let now = (OffsetDateTime::now_utc().unix_timestamp_nanos() / 1_000_000) as u64;
+        if now > self.session_time.load(SeqCst) + 600_000 {
+            self.session_time.store(now, SeqCst);
+            let Ok(session) = auth::login(&self.inner, &self.env, &self.api_key).await else {
+                return self.session_cookie.read().await.clone();
+            };
+            let session_cookie = Arc::new(session.session_cookie);
+            *self.session_cookie.write().await = session_cookie.clone();
+            session_cookie
+        } else {
+            self.session_cookie.read().await.clone()
+        }
     }
 
-    pub fn auth_headers(&self) -> HeaderMap {
+    pub async fn auth_headers(&self) -> HeaderMap {
         let mut headers = HeaderMap::new();
         if let Ok(v) = HeaderValue::from_str(&self.account_id) {
             headers.insert("X-Grvt-Account-Id", v);
         }
-        if let Ok(v) = HeaderValue::from_str(&self.session_cookie) {
+        if let Ok(v) = HeaderValue::from_str(&self.get_session_cookie().await) {
             headers.insert("Cookie", v);
         }
         headers
@@ -151,7 +159,7 @@ impl GrvtClient {
         let resp = self
             .inner
             .post(&url)
-            .headers(self.auth_headers())
+            .headers(self.auth_headers().await)
             .header(reqwest::header::CONTENT_TYPE, "application/json")
             .body(raw_body)
             .send()
