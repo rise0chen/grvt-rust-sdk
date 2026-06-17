@@ -150,7 +150,7 @@ pub fn sign_order(params: &SignOrderParams, private_key_bytes: &[u8]) -> Result<
     let digest: B256 = order.eip712_signing_hash(&domain);
 
     let msg = Message::from_digest(*digest);
-    let recoverable: RecoverableSignature = secp.sign_ecdsa_recoverable(&msg, &secret_key);
+    let recoverable: RecoverableSignature = secp.sign_ecdsa_recoverable(msg, &secret_key);
     let (recid, compact) = recoverable.serialize_compact();
     let r = format!("0x{}", hex::encode(&compact[..32]));
     let s = format!("0x{}", hex::encode(&compact[32..]));

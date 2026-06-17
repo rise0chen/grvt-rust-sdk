@@ -1,30 +1,30 @@
 [package]
-name = "grvt-rust-sdk"
-version = "0.1.0"
-edition = "2021"
 description = "Rust SDK for Gravity Markets (GRVT) REST, WebSocket, and EIP-712 signing APIs"
+edition = "2021"
 license = "MIT"
+name = "grvt-rust-sdk"
 publish = false
+version = "0.1.0"
 
 [dependencies]
-reqwest = { version = "0.13", features = ["json"] }
-tokio = { version = "1", features = ["sync", "macros"] }
-tokio-tungstenite = { version = "0.28", features = ["native-tls"] }
-futures = "0.3"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde_with = { version = "3" }
-hex = "0.4"
-rand = "0.9"
-chrono = "0.4"
-url = "2.5"
-time = "0.3"
-tracing = "0.1"
-thiserror = "1"
-secp256k1 = { version = "0.30", features = ["rand", "recovery"] }
-alloy-primitives = "1"
-alloy-sol-types = "1"
-dotenvy = "0.15"
+alloy-primitives = {version = "1", default-features = false}
+alloy-sol-types = {version = "1", default-features = false}
+chrono = {version = "0.4", default-features = false, features = ["now"]}
+futures = {version = "0.3", default-features = false}
+hex = {version = "0.4", default-features = false, features = ["std"]}
+rand = {version = "0.9", default-features = false}
+reqwest = {version = "0.13", default-features = false, features = ["json"]}
+secp256k1 = {version = "0.31", default-features = false, features = ["alloc", "rand", "recovery"]}
+serde = {version = "1.0", default-features = false, features = ["derive"]}
+serde_json = {version = "1", default-features = false}
+serde_with = {version = "3", default-features = false, features = ["alloc", "macros"]}
+thiserror = {version = "2", default-features = false}
+time = {version = "0.3", default-features = false, features = ["std"]}
+tokio = {version = "1", default-features = false, features = ["sync", "macros"]}
+tokio-tungstenite = {version = "0.28", default-features = false, features = ["connect", "native-tls"]}
+tracing = {version = "0.1", default-features = false}
+url = {version = "2", default-features = false}
 
 [dev-dependencies]
-tokio = { version = "1", features = ["full"] }
+dotenvy = {version = "0.15", default-features = false}
+tokio = {version = "1", features = ["full"]}
