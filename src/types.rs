@@ -193,6 +193,7 @@ pub struct InstrumentInfo {
     pub min_size: f64,
     #[serde_as(as = "DisplayFromStr")]
     pub min_notional: f64,
+    pub funding_interval_hours: u64,
 }
 
 #[serde_as]
