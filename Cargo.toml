@@ -6,6 +6,11 @@ name = "grvt-rust-sdk"
 publish = false
 version = "0.1.0"
 
+[features]
+default = ["rustls-tls"]
+native-tls = ["tokio-tungstenite/native-tls"]
+rustls-tls = ["tokio-tungstenite/rustls-tls-native-roots"]
+
 [dependencies]
 alloy-primitives = {version = "1", default-features = false}
 alloy-sol-types = {version = "1", default-features = false}
@@ -21,7 +26,7 @@ serde_with = {version = "3", default-features = false, features = ["alloc", "mac
 thiserror = {version = "2", default-features = false}
 time = {version = "0.3", default-features = false, features = ["std"]}
 tokio = {version = "1", default-features = false, features = ["sync", "macros"]}
-tokio-tungstenite = {version = "0.28", default-features = false, features = ["connect", "native-tls"]}
+tokio-tungstenite = {version = "0.28", default-features = false, features = ["connect"]}
 tracing = {version = "0.1", default-features = false}
 url = {version = "2", default-features = false}
 
