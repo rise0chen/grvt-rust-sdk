@@ -26,7 +26,7 @@ serde_with = {version = "3", default-features = false, features = ["alloc", "mac
 thiserror = {version = "2", default-features = false}
 time = {version = "0.3", default-features = false, features = ["std"]}
 tokio = {version = "1", default-features = false, features = ["sync", "macros"]}
-tokio-tungstenite = {version = "0.28", default-features = false, features = ["connect"]}
+tokio-tungstenite = {version = "0.29", default-features = false, features = ["connect"]}
 tracing = {version = "0.1", default-features = false}
 url = {version = "2", default-features = false}
 
